@@ -8,12 +8,18 @@ namespace LogAn
 {
     public class LogAnalyzer
     {
+        public interface ISendEMail
+        {
+            void SendEMail(string to, string subject, string body);
+        }
 
         private IWebService mWebService;
+        private ISendEMail mSendEMail;
 
-        public LogAnalyzer(IWebService webService)
+        public LogAnalyzer(IWebService webService, ISendEMail email)
         {
             mWebService = webService;
+            mSendEMail = email;
         }
 
         public bool IsValidLogFileName(string fileName)
@@ -27,8 +33,19 @@ namespace LogAn
 
         public void Analyze(string filename)
         {
+            
             if (filename.Length < 8)
-                mWebService.LogError("Filename too short:" + filename);
+            {
+                try
+                {
+                    mWebService.LogError("Filename too short:" + filename);
+                }
+                catch (Exception ex)
+                {
+                    mSendEMail.SendEMail("someone@somewhere.com", "Can't log data", ex.Message);
+                }
+            }
+                
         }
     }
 }

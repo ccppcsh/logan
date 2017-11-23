@@ -5,13 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit;
 using NUnit.Framework;
+using static LogAn.LogAnalyzer;
 
 namespace LogAn.UnitTests
 {
     [TestFixture]
     public class LogAnalyzerTests
     {
-        [TestCase("filewithgoodextension.SLF", true)]
+        /*[TestCase("filewithgoodextension.SLF", true)]
         [TestCase("filewithgoodextension.slf", true)]
         [TestCase("filewithbadextension.foo", false)]
         public void IsValidFileName_VariousExtensions_ChecksThem(string file, bool expected)
@@ -33,13 +34,44 @@ namespace LogAn.UnitTests
 
             StringAssert.Contains("Filename too short:123.ext", fakeWebService.LastError);
         }
+        */
 
+        [Test]
+        public void Analyze_WebServiceThrows_SendsEMail()
+        {
+            FakeWebService fakeWebService = new FakeWebService();
+            fakeWebService.ToThrow = new Exception("fake exception");
+
+            FakeEMailService mockEmail = new FakeEMailService();
+
+            LogAnalyzer logAnalyzer = new LogAnalyzer(fakeWebService, mockEmail);
+
+            logAnalyzer.Analyze("123.ext");
+
+            StringAssert.Contains("someone@somewhere.com", mockEmail.To);
+            StringAssert.Contains("fake exception", mockEmail.Body);
+            StringAssert.Contains("Can't log data", mockEmail.Subject);
+        }
+
+        public class FakeEMailService : ISendEMail
+        {
+            public String To;
+            public String Subject;
+            public String Body;
+            public void SendEMail(string to, string subject, string body)
+            {
+                To = to;
+                Subject = subject;
+                Body = body;
+            }
+        }
         public class FakeWebService : IWebService
         {
-            public String LastError;
+            public Exception ToThrow;
             public void LogError(string message)
             {
-                LastError = message;
+                if (ToThrow != null)
+                    throw ToThrow;
             }
         }
 
