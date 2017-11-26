@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NUnit;
 using NUnit.Framework;
 using static LogAn.LogAnalyzer;
+using NSubstitute;
 
 namespace LogAn.UnitTests
 {
@@ -36,7 +37,7 @@ namespace LogAn.UnitTests
         }
         */
 
-        [Test]
+        /*[Test]
         public void Analyze_WebServiceThrows_SendsEMail()
         {
             FakeWebService fakeWebService = new FakeWebService();
@@ -51,6 +52,18 @@ namespace LogAn.UnitTests
             StringAssert.Contains("someone@somewhere.com", mockEmail.To);
             StringAssert.Contains("fake exception", mockEmail.Body);
             StringAssert.Contains("Can't log data", mockEmail.Subject);
+        }*/
+
+        [Test]
+        public void Analyze_NameToShort_CallsLogger()
+        {
+            ILogger fakeLogger = Substitute.For<ILogger>();
+
+            LogAnalyzer analyzer = new LogAnalyzer(fakeLogger);
+
+            analyzer.Analyze("a.txt");
+
+            fakeLogger.Received().LogError("Filename too short:a.txt");
         }
 
         public class FakeEMailService : ISendEMail

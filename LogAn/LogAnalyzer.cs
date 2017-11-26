@@ -15,11 +15,11 @@ namespace LogAn
 
         private IWebService mWebService;
         private ISendEMail mSendEMail;
+        private ILogger mLogger;
 
-        public LogAnalyzer(IWebService webService, ISendEMail email)
+        public LogAnalyzer(ILogger logger)
         {
-            mWebService = webService;
-            mSendEMail = email;
+            mLogger = logger;
         }
 
         public bool IsValidLogFileName(string fileName)
@@ -38,11 +38,11 @@ namespace LogAn
             {
                 try
                 {
-                    mWebService.LogError("Filename too short:" + filename);
+                    mLogger.LogError("Filename too short:" + filename);
                 }
                 catch (Exception ex)
                 {
-                    mSendEMail.SendEMail("someone@somewhere.com", "Can't log data", ex.Message);
+                    //mSendEMail.SendEMail("someone@somewhere.com", "Can't log data", ex.Message);
                 }
             }
                 
