@@ -86,6 +86,11 @@ namespace LogAn.UnitTests
                 if (ToThrow != null)
                     throw ToThrow;
             }
+
+            public void Write(string msg)
+            {
+
+            }
         }
 
 
