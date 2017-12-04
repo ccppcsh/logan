@@ -24,7 +24,7 @@ namespace LogAn.UnitTests
                 .Do(info => { throw new Exception("fake exception"); });
 
             var analyzer = new LogAnalyzer2(stubLogger, mockWebService);
-
+            // Comment
             analyzer.MinNameLength = 10;
             //Act
             analyzer.Analyze("123.txt");
